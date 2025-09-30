@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { NextFunction, Request, Response } from 'express';
-// import auth from '../../middlewares/auth';
-// import USER_ROLES from '../user/user.constant';
+
 import { multerUpload } from '../../config/multer.config';
 import { projectControllers } from './project.controller';
 import { projectValidationsSchema } from './project.validation';

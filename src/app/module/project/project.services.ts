@@ -7,7 +7,7 @@ const createProjectInDB = async (payload: IProject) => {
 };
 
 const getAllProjectsFromDB = async () => {
-  return await Project.find({ $isDeleted: { $ne: true } });
+  return await Project.find({ isDeleted: { $ne: true } });
 };
 
 const getSingleProjectFromDB = async (id: string) => {
