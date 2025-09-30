@@ -74,7 +74,7 @@ const updateProjectValidationSchema = z.object({
   }),
 });
 
-export const projectValidationSchema = {
+export const projectValidationsSchema = {
   createProjectValidationSchema,
   updateProjectValidationSchema,
 };
