@@ -1,0 +1,22 @@
+import { Document, Model, Types } from 'mongoose';
+import { TMethod } from '../user/user.constant';
+import { IUserAddress, IUserName } from '../../interface/user';
+
+export interface ICustomer extends Document {
+  name: IUserName;
+  email: string;
+  phoneNumber: string;
+  user: Types.ObjectId;
+
+  orders?: Types.ObjectId[];
+
+  profileImg?: string;
+  address?: IUserAddress;
+  method?: TMethod;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface CustomerModel extends Model<ICustomer> {
+  isCustomerExistsById(id: string): Promise<ICustomer | null>;
+}
