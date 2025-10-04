@@ -41,6 +41,8 @@ const createAProject = catchAsync(async (req: Request, res: Response) => {
 
 const updateAProject = catchAsync(async (req: Request, res: Response) => {
   const updatedData = req.body;
+  console.log(updatedData);
+
   const { projectId } = req.params;
   const result = await projectService.updateSingleProjectFromDB(
     projectId,

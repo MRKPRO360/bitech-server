@@ -3,6 +3,7 @@ import UserRouter from '../module/user/user.routes';
 import CustomerRouter from '../module/customer/customer.routes';
 import OrderRouter from '../module/order/order.routes';
 import ProjectRouter from '../module/project/project.route';
+import PrebuiltProjectRouter from '../module/prebuilt-project/prebuiltProject.route';
 const router = Router();
 const moduleRoutes = [
   {
@@ -20,6 +21,10 @@ const moduleRoutes = [
   {
     path: '/projects',
     route: ProjectRouter,
+  },
+  {
+    path: '/prebuilt-projects',
+    route: PrebuiltProjectRouter,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

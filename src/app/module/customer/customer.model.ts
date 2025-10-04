@@ -17,19 +17,17 @@ const customerNameSchema = new Schema<IUserName>(
       default: '',
     },
   },
-  {
-    timestamps: true,
-    toJSON: {
-      virtuals: true,
-    },
-  },
+  { _id: false },
 );
 
-const customerAddressSchema = new Schema<IUserAddress>({
-  address: { type: String },
-  city: { type: String },
-  zipCode: { type: String },
-});
+const customerAddressSchema = new Schema<IUserAddress>(
+  {
+    city: { type: String },
+    zipCode: { type: String },
+    country: { type: String },
+  },
+  { _id: false },
+);
 
 const CustomerSchema = new Schema<ICustomer, CustomerModel>(
   {

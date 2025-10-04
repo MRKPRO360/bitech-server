@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { AdminModel, IAdmin } from './admin.interface';
-import { DISTRICTS, IUserAddress, IUserName } from '../../interface/user';
+import { IUserAddress, IUserName } from '../../interface/user';
 import { User } from '../user/user.model';
 
 const adminNameSchema = new Schema<IUserName>({
@@ -18,12 +18,16 @@ const adminNameSchema = new Schema<IUserName>({
   },
 });
 
-const adminAddressSchema = new Schema<IUserAddress>({
-  street: { type: String, required: true },
-  city: { type: String, required: true },
-  district: { type: String, enum: DISTRICTS, required: true },
-  zipCode: { type: String, required: true },
-});
+const adminAddressSchema = new Schema<IUserAddress>(
+  {
+    country: { type: String, required: true },
+    city: { type: String, required: true },
+    zipCode: { type: String, required: true },
+  },
+  {
+    _id: false,
+  },
+);
 
 const adminSchema = new Schema<IAdmin, AdminModel>(
   {

@@ -25,9 +25,8 @@ const updateCustomerNameValidationSchema = z.object({
 });
 
 const customerAddressValidationSchema = z.object({
-  street: z.string().optional(),
+  country: z.string().optional(),
   city: z.string({ message: 'Invalid city' }).optional(),
-  district: z.string({ message: 'Invalid district' }).optional(),
   zipCode: z.string().optional(),
 });
 

@@ -14,14 +14,13 @@ export const createAdminNameSchema = z.object({
 });
 
 export const createAdminAddressSchema = z.object({
-  street: z.string().trim().min(3, 'Street is required'),
   city: z.string().trim().min(3, 'City is required'),
-  district: z.string({ message: 'Invalid district' }),
+  country: z.string({ message: 'Invalid country' }),
   zipCode: z
     .string()
     .trim()
-    .min(4, 'Zip code is required')
-    .max(10, 'Zip code is too long'),
+    .min(3, 'Zip code is required')
+    .max(20, 'Zip code is too long'),
 });
 
 export const createAdminValidationSchema = z.object({

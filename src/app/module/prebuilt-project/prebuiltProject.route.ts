@@ -2,15 +2,15 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import { multerUpload } from '../../config/multer.config';
-import { projectControllers } from './project.controller';
-import { projectValidationsSchema } from './project.validation';
 import validateRequest from '../../middleware/validateRequest';
+import { PrebuiltprojectControllers } from './prebuiltProject.controller';
+import { PrebuiltProjectValidationsSchema } from './prebuiltProject.validation';
 
 const router = express.Router();
 
 router
   .route('/')
-  .get(projectControllers.getAllProjects)
+  .get(PrebuiltprojectControllers.getAllPrebuiltProjects)
   .post(
     multerUpload.fields([
       { name: 'thumbnail', maxCount: 1 },
@@ -29,7 +29,7 @@ router
         req.body.images.thumbnail = (req.files as any).thumbnail[0].path;
       }
 
-      // PROJECT IMAGES
+      // PrebuiltROJECT IMAGES
       if (req.files && (req.files as any).gallery) {
         req.body.images.gallery = (req.files as any).gallery.map(
           (file: any) => file.path,
@@ -38,13 +38,15 @@ router
 
       next();
     },
-    validateRequest(projectValidationsSchema.createProjectValidationSchema),
-    projectControllers.createAProject,
+    validateRequest(
+      PrebuiltProjectValidationsSchema.createPrebuiltProjectValidationSchema,
+    ),
+    PrebuiltprojectControllers.createAPrebuiltProject,
   );
 
 router
-  .route('/:projectId')
-  .get(projectControllers.getAProject)
+  .route('/:PrebuiltrojectId')
+  .get(PrebuiltprojectControllers.getAPrebuiltProject)
   .patch(
     multerUpload.fields([
       { name: 'thumbnail', maxCount: 1 },
@@ -61,7 +63,7 @@ router
         req.body.images.thumbnail = (req.files as any).thumbnail[0].path;
       }
 
-      // PROJECT IMAGES
+      // PrebuiltROJECT IMAGES
       if (req.files && (req.files as any).gallery) {
         req.body.images.gallery = (req.files as any).gallery.map(
           (file: any) => file.path,
@@ -70,9 +72,11 @@ router
 
       next();
     },
-    validateRequest(projectValidationsSchema.updateProjectValidationSchema),
-    projectControllers.updateAProject,
+    validateRequest(
+      PrebuiltProjectValidationsSchema.updatePrebuiltProjectValidationSchema,
+    ),
+    PrebuiltprojectControllers.updateAPrebuiltProject,
   )
-  .delete(projectControllers.deleteAProject);
+  .delete(PrebuiltprojectControllers.deleteAPrebuiltProject);
 
 export default router;
