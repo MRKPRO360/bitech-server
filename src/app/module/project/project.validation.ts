@@ -3,7 +3,7 @@ import { z } from 'zod';
 const createProjectValidationSchema = z.object({
   body: z.object({
     title: z.string().min(3),
-    slug: z.string().min(3),
+    slug: z.string().min(3).optional(),
     category: z.string().min(3),
     client: z.string().min(3),
     duration: z.string().min(3),

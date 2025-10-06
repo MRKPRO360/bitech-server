@@ -5,7 +5,9 @@ import { PrebuiltProjectService } from './prebuiltProject.services';
 
 const getAllPrebuiltProjects = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await PrebuiltProjectService.getAllPrebuiltProjectsFromDB();
+    const result = await PrebuiltProjectService.getAllPrebuiltProjectsFromDB(
+      req.query,
+    );
 
     sendResponse(res, {
       statusCode: 200,
@@ -17,11 +19,11 @@ const getAllPrebuiltProjects = catchAsync(
 );
 
 const getAPrebuiltProject = catchAsync(async (req: Request, res: Response) => {
-  const { PrebuiltprojectId } = req.params;
+  const { prebuiltProjectId } = req.params;
 
   const result =
     await PrebuiltProjectService.getSinglePrebuiltProjectFromDB(
-      PrebuiltprojectId,
+      prebuiltProjectId,
     );
 
   sendResponse(res, {
@@ -51,12 +53,11 @@ const createAPrebuiltProject = catchAsync(
 const updateAPrebuiltProject = catchAsync(
   async (req: Request, res: Response) => {
     const updatedData = req.body;
-    console.log(updatedData);
 
-    const { PrebuiltprojectId } = req.params;
+    const { prebuiltProjectId } = req.params;
     const result =
       await PrebuiltProjectService.updateSinglePrebuiltProjectFromDB(
-        PrebuiltprojectId,
+        prebuiltProjectId,
         updatedData,
       );
 

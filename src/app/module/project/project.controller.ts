@@ -4,8 +4,7 @@ import { projectService } from './project.services';
 import sendResponse from '../../utils/sendResponse';
 
 const getAllProjects = catchAsync(async (req: Request, res: Response) => {
-  const result = await projectService.getAllProjectsFromDB();
-  console.log('ok');
+  const result = await projectService.getAllProjectsFromDB(req.query);
 
   sendResponse(res, {
     statusCode: 200,

@@ -3,7 +3,7 @@ import { z } from 'zod';
 const createPrebuiltProjectValidationSchema = z.object({
   body: z.object({
     title: z.string().min(3),
-    slug: z.string().min(3),
+    slug: z.string().min(3).optional(),
     category: z.string().min(3),
     budget: z.string().min(3),
     status: z.enum(['completed', 'in-progress', 'draft', 'archived']),

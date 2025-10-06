@@ -1,13 +1,41 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
+import { slugify } from '../../utils/slugify';
+import { projectSearchableFields } from './project.constant';
 import { IProject } from './project.interface';
 import Project from './project.model';
 
 const createProjectInDB = async (payload: IProject) => {
-  return await Project.create(payload);
+  const slug = slugify(payload.title);
+
+  let uniqueSlug = slug;
+  let counter = 1;
+
+  while (await Project.findOne({ slug: uniqueSlug })) {
+    uniqueSlug = `${slug}-${counter}`;
+    counter++;
+  }
+  return await Project.create({ ...payload, slug: uniqueSlug });
 };
 
-const getAllProjectsFromDB = async () => {
-  return await Project.find({ isDeleted: { $ne: true } });
+const getAllProjectsFromDB = async (query: Record<string, unknown>) => {
+  const projectsQuery = new QueryBuilder(
+    Project.find({ isDeleted: { $ne: true } }),
+    query,
+  )
+    .search(projectSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await projectsQuery.countTotal();
+  const result = await projectsQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleProjectFromDB = async (id: string) => {

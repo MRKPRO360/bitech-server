@@ -1,6 +1,6 @@
 import { Document, Model } from 'mongoose';
 import { TMethod, USER_ROLE } from './user.constant';
-import { IUserAddress, IUserName } from '../../interface/user';
+import { IUserName } from '../../interface/user';
 
 export type TUserRole = keyof typeof USER_ROLE;
 

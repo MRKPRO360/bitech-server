@@ -94,9 +94,11 @@ const PrebuiltProjectSchema = new Schema<
   },
 );
 
-PrebuiltProjectSchema.statics.isProjectExistsById = async (id: string) =>
-  await PrebuiltProject.findById(id);
-
+PrebuiltProjectSchema.statics.isPrebuiltProjectExistsById = async function (
+  id: string,
+) {
+  return await this.findById(id);
+};
 const PrebuiltProject = mongoose.model<IPrebuiltProject, PrebuiltProjectModel>(
   'PrebuiltProject',
   PrebuiltProjectSchema,

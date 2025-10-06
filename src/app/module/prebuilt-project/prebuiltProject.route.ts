@@ -45,7 +45,7 @@ router
   );
 
 router
-  .route('/:PrebuiltrojectId')
+  .route('/:prebuiltProjectId')
   .get(PrebuiltprojectControllers.getAPrebuiltProject)
   .patch(
     multerUpload.fields([

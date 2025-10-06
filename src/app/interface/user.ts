@@ -4,7 +4,6 @@ export type IUserName = {
 };
 
 export interface IUserAddress {
-  address: string;
   city: string;
   country: string;
   zipCode: string;
