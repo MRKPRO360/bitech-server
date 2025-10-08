@@ -5,9 +5,15 @@ export type IStatus = 'Pending' | 'Completed' | 'Cancelled';
 export interface IOrderService {
   service: Types.ObjectId;
 }
+
+export interface IOrderProjects {
+  projects: Types.ObjectId;
+}
+
 export interface IOrder extends Document {
   user: Types.ObjectId;
   services: IOrderService[];
+  projects: IOrderProjects[];
   price: number;
   paymentMethod: 'Cash' | 'Card' | 'Online';
   orderStatus: IStatus;

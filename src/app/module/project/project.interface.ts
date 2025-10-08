@@ -32,6 +32,7 @@ export interface IProject extends Document {
   liveLink?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  isDeleted?: boolean;
 }
 
 export interface ProjectModel extends Model<IProject> {

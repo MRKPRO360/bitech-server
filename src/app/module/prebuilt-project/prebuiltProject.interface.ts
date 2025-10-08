@@ -32,6 +32,7 @@ export interface IPrebuiltProject extends Document {
   images?: IPrebuiltProjectImages;
   createdAt?: Date;
   updatedAt?: Date;
+  isDeleted?: boolean;
 }
 
 export interface PrebuiltProjectModel extends Model<IPrebuiltProject> {

@@ -10,7 +10,21 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: ['http://localhost:3000'],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'http://localhost:3000', // local dev frontend
+        'https://bttech-beta.vercel.app', // deployed frontend domain
+      ];
+
+      // allow requests with no origin (like Postman or server-to-server)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   }),
 );

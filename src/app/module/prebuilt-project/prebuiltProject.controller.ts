@@ -72,8 +72,8 @@ const updateAPrebuiltProject = catchAsync(
 
 const deleteAPrebuiltProject = catchAsync(
   async (req: Request, res: Response) => {
-    const { PrebuiltprojectId } = req.params;
-    await PrebuiltProjectService.deletePrebuiltProjectFromDB(PrebuiltprojectId);
+    const { prebuiltProjectId } = req.params;
+    await PrebuiltProjectService.deletePrebuiltProjectFromDB(prebuiltProjectId);
 
     sendResponse(res, {
       statusCode: 200,

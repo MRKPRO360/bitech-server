@@ -14,16 +14,22 @@ const orderSchema = new Schema<IOrder>(
         service: {
           type: Schema.Types.ObjectId,
           ref: 'Service',
-          required: true,
-        },
-
-        status: {
-          type: String,
-          enum: ['Pending', 'Completed', 'Cancelled'],
-          default: 'Pending',
         },
       },
     ],
+    projects: [
+      {
+        project: {
+          type: Schema.Types.ObjectId,
+          ref: 'PrebuiltProject',
+        },
+      },
+    ],
+
+    payment: {
+      type: Schema.Types.ObjectId,
+      ref: 'Payment',
+    },
 
     price: {
       type: Number,
@@ -40,10 +46,6 @@ const orderSchema = new Schema<IOrder>(
       type: String,
       enum: ['Pending', 'Completed', 'Canecelled'],
       default: 'Pending',
-    },
-    payment: {
-      type: Schema.Types.ObjectId,
-      ref: 'Payment',
     },
   },
   {
