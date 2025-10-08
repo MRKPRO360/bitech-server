@@ -23,4 +23,8 @@ export default {
   store_id: process.env.STORE_ID,
   store_password: process.env.STORE_PASSWORD,
   is_live: process.env.IS_LIVE === 'true' ? true : false,
+  validation_url: process.env.VALIDATION_URL,
+  success_url: process.env.SUCCESS_URL,
+  failed_url: process.env.FAILED_URL,
+  cancel_url: process.env.CANCEL_URL,
 };

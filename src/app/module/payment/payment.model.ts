@@ -30,7 +30,7 @@ const paymentSchema = new Schema<IPayment>(
       type: String,
       default: null,
     },
-    price: {
+    amount: {
       type: Number,
       required: true,
       min: 0,

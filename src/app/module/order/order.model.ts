@@ -31,7 +31,7 @@ const orderSchema = new Schema<IOrder>(
       ref: 'Payment',
     },
 
-    price: {
+    amount: {
       type: Number,
       required: true,
       min: 0,

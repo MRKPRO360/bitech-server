@@ -20,3 +20,7 @@ export interface ICustomer extends Document {
 export interface CustomerModel extends Model<ICustomer> {
   isCustomerExistsById(id: string): Promise<ICustomer | null>;
 }
+
+export interface CustomerModel extends Model<ICustomer> {
+  isCustomerExistsByEmail(email: string): Promise<ICustomer | null>;
+}

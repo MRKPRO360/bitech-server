@@ -7,14 +7,14 @@ export interface IOrderService {
 }
 
 export interface IOrderProjects {
-  projects: Types.ObjectId;
+  project: Types.ObjectId;
 }
 
 export interface IOrder extends Document {
   user: Types.ObjectId;
   services: IOrderService[];
   projects: IOrderProjects[];
-  price: number;
+  amount: number;
   paymentMethod: 'Cash' | 'Card' | 'Online';
   orderStatus: IStatus;
   paymentIntentId?: string;

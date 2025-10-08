@@ -10,6 +10,10 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 import Admin from '../admin/admin.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import PrebuiltProject from '../prebuilt-project/prebuiltProject.model';
+import { generateTransactionId } from '../payment/payment.utils';
+import { sslService } from '../sslcommerz/sslcommerz.service';
+import Customer from '../customer/customer.model';
 
 const stripe = new Stripe(config.stripe_sk_test as string);
 
@@ -20,9 +24,34 @@ const createOrder = async (
   const session = await mongoose.startSession();
   session.startTransaction();
 
+  let totalAmount = 0;
+
   try {
     // if (orderData.services) {
     // const servicePrice =
+    // }
+
+    if (orderData.projects && orderData.projects.length) {
+      for (const projectItem of orderData.projects) {
+        const project = await PrebuiltProject.findById(projectItem.project);
+
+        if (project) {
+          if (project?.isDeleted) {
+            throw new AppError(400, 'Project is deleted.');
+          }
+        } else {
+          throw new AppError(404, 'Project is not found');
+        }
+
+        totalAmount += Number(project.price);
+      }
+    }
+
+    // if (orderData.services && orderData.services.length > 0) {
+    //   for (const serviceItem of orderData.services) {
+    //     const service = await Service.findById(serviceItem.service);
+    //     if (service) totalAmount += Number(service.price);
+    //   }
     // }
 
     // Create the order
@@ -32,50 +61,44 @@ const createOrder = async (
     });
 
     const createdOrder = await order.save({ session });
-    await createdOrder.populate('user meals.meal');
+
+    await createdOrder.populate('user projects.project');
+
+    const transactionId = generateTransactionId();
+
+    const payment = new Payment({
+      user: authUser.id,
+      order: createdOrder._id,
+      method: orderData.paymentMethod,
+      transactionId,
+      amount: totalAmount,
+    });
+
+    await payment.save({ session });
 
     let result;
 
-    if (createdOrder.paymentMethod == 'Card') {
-      const payment = new Payment({
-        user: authUser.id,
-        order: createdOrder._id,
-        method: orderData.paymentMethod,
-        paymentIntentId: orderData.paymentIntentId,
-        price: createdOrder.price,
-        status: 'Paid',
-      });
+    const customer = await Customer.isCustomerExistsByEmail(authUser.email);
 
-      result = await payment.save({ session });
+    if (createdOrder.paymentMethod === 'Online') {
+      result = await sslService.initPayment({
+        total_amount: createdOrder.amount,
+        tran_id: transactionId,
+        cus_name: customer?.name.firstName + ' ' + customer?.name.lastName,
+        cus_email: customer?.email,
+        cus_city: customer?.address?.city,
+        cus_postcode: customer?.address?.zipCode,
+        cus_country: customer?.address?.country,
+        cus_phone: customer?.phoneNumber,
+      });
+      result = { paymentUrl: result };
+    } else {
+      result = order;
     }
 
     // Commit the transaction
     await session.commitTransaction();
     session.endSession();
-
-    // const pdfBuffer = await generateOrderInvoicePDF(createdOrder);
-
-    // const emailContent = await EmailHelper.createEmailContent(
-    //   {
-    //     userName: (createdOrder.user as unknown as IUser).name.firstName || '',
-    //   },
-    //   'orderInvoice',
-    // );
-
-    // const attachment = {
-    //   filename: `Invoice_${createdOrder._id}.pdf`,
-    //   content: pdfBuffer,
-    //   encoding: 'base64', // if necessary
-    // };
-
-    // if (emailContent) {
-    //   await EmailHelper.sendEmail(
-    //     (createdOrder.user as unknown as IUser).email,
-    //     emailContent,
-    //     'Order confirmed!',
-    //     attachment,
-    //   );
-    // }
 
     return result;
   } catch (error) {
@@ -101,12 +124,31 @@ const createPaymentIntent = async (price: string) => {
   return paymentIntent.client_secret;
 };
 
-const getAllOrdersFromDB = async () => {
-  return await Order.find({});
+const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
+  const orderQuery = new QueryBuilder(
+    Order.find().populate('user services.service projects.project'),
+    query,
+  )
+    .search(['user.name', 'user.email', 'products.product.name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery;
+
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const getOrderDetailsFromDB = async (orderId: string) => {
-  const order = await Order.findById(orderId).populate('user services');
+  const order = await Order.findById(orderId).populate(
+    'user services.service projects.project',
+  );
   if (!order) {
     throw new AppError(404, 'Order not Found');
   }
@@ -119,10 +161,17 @@ const getMyOrdersFromDB = async (
   authUser: JwtPayload,
 ) => {
   const orderQuery = new QueryBuilder(
-    Order.find({ user: authUser.id }).populate('user meals.meal'),
+    Order.find({ user: authUser.id }).populate(
+      'user services.service projects.project',
+    ),
     query,
   )
-    .search(['user.name', 'user.email', 'meals.meal.recipeName'])
+    .search([
+      'user.name',
+      'user.email',
+      'services.service.name',
+      'projects.project.title',
+    ])
     .filter()
     .sort()
     .paginate()
@@ -149,7 +198,7 @@ const updateOrderStatusByAdminFromDB = async (
 
   if (!admin) throw new AppError(400, 'No provider found!');
 
-  const order = await Order.findById(orderId).populate('services');
+  const order = await Order.findById(orderId);
 
   if (!order) {
     throw new AppError(400, 'Order not found');

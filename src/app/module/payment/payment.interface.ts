@@ -7,7 +7,7 @@ export interface IPayment {
   method: 'COD' | 'Online' | 'Card';
   status: 'Pending' | 'Paid' | 'Failed';
   paymentIntentId?: string;
-  price: number;
+  amount: number;
   gatewayResponse?: Record<string, any>;
   createdAt?: Date;
   updatedAt?: Date;
