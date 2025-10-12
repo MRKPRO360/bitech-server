@@ -31,7 +31,7 @@ const createPaymentIntent = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderService.getAllOrdersFromDB();
+  const result = await OrderService.getAllOrdersFromDB(req.query);
 
   sendResponse(res, {
     statusCode: 200,

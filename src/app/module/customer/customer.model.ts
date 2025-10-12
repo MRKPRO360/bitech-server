@@ -80,7 +80,7 @@ CustomerSchema.statics.isCustomerExistsById = async function (id: string) {
 CustomerSchema.statics.isCustomerExistsByEmail = async function (
   email: string,
 ) {
-  return await Customer.findById({ email });
+  return await Customer.findOne({ email });
 };
 
 const Customer = mongoose.model<ICustomer, CustomerModel>(

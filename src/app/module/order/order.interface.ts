@@ -1,4 +1,5 @@
 import { Types, Document } from 'mongoose';
+import { IPrebuiltProject } from '../prebuilt-project/prebuiltProject.interface';
 
 export type IStatus = 'Pending' | 'Completed' | 'Cancelled';
 
@@ -7,7 +8,8 @@ export interface IOrderService {
 }
 
 export interface IOrderProjects {
-  project: Types.ObjectId;
+  _id: Types.ObjectId;
+  project: IPrebuiltProject;
 }
 
 export interface IOrder extends Document {

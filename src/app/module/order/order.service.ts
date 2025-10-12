@@ -30,10 +30,15 @@ const createOrder = async (
     // if (orderData.services) {
     // const servicePrice =
     // }
+    console.log(orderData.projects);
 
+    // return;
+    // ADDING ALL PROJECTS PRICE
     if (orderData.projects && orderData.projects.length) {
       for (const projectItem of orderData.projects) {
-        const project = await PrebuiltProject.findById(projectItem.project);
+        console.log(projectItem._id);
+
+        const project = await PrebuiltProject.findById(projectItem._id);
 
         if (project) {
           if (project?.isDeleted) {

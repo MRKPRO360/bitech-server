@@ -35,10 +35,16 @@ const initPayment = async (paymentData: {
     total_amount,
     currency: 'BDT',
     tran_id, // Use unique tran_id for each API call
-    success_url: `${config.validation_url}?tran_id=${tran_id}`,
+    shipping_method: 'NO',
+    // success_url: `${config.frontend_url}/success/${tran_id}`,
+    success_url: `${config.frontend_url}/success`,
+
     fail_url: config.failed_url as string,
     cancel_url: config.cancel_url as string,
     ipn_url: 'https://bttech-beta.vercel.app/api/v1/ssl/ipn',
+    product_name: 'website',
+    product_category: 'online',
+    product_profile: 'xxx',
     cus_name,
     cus_email,
     cus_city,
@@ -53,6 +59,7 @@ const initPayment = async (paymentData: {
     const apiResponse = await sslcz.init(data);
 
     // Redirect the user to the payment gateway
+
     const GatewayPageURL = apiResponse.GatewayPageURL;
 
     if (GatewayPageURL) {
@@ -79,8 +86,6 @@ const validatePaymentService = async (tran_id: string): Promise<boolean> => {
     const validationResponse = await sslcz.transactionQueryByTransactionId({
       tran_id,
     });
-
-    console.log(validationResponse.element);
 
     let data;
 
@@ -133,8 +138,6 @@ const validatePaymentService = async (tran_id: string): Promise<boolean> => {
     // Commit transaction only if no errors occurred
     await session.commitTransaction();
     session.endSession();
-
-    console.log('email');
 
     return true;
   } catch (error) {

@@ -14,6 +14,8 @@ app.use(
       const allowedOrigins = [
         'http://localhost:3000', // local dev frontend
         'https://bttech-beta.vercel.app', // deployed frontend domain
+        'https://sandbox.sslcommerz.com', // SSLCommerz sandbox
+        'https://securepay.sslcommerz.com', // live gateway
       ];
 
       // allow requests with no origin (like Postman or server-to-server)

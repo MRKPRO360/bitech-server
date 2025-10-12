@@ -50,6 +50,8 @@ const createAdmin = catchAsync(async (req, res) => {
 });
 
 const getMe = catchAsync(async (req, res) => {
+  console.log('ok');
+
   const { id, role } = req.user!;
   const result = await UserServices.getMe(id, role);
 

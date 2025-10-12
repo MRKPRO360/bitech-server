@@ -5,6 +5,8 @@ import OrderRouter from '../module/order/order.routes';
 import ProjectRouter from '../module/project/project.route';
 import PrebuiltProjectRouter from '../module/prebuilt-project/prebuiltProject.route';
 import AuthRouter from '../module/auth/auth.routes';
+import SSLRouter from '../module/sslcommerz/sslcommerz.routes';
+
 const router = Router();
 const moduleRoutes = [
   {
@@ -30,6 +32,10 @@ const moduleRoutes = [
   {
     path: '/auth',
     route: AuthRouter,
+  },
+  {
+    path: '/ssl',
+    route: SSLRouter,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
