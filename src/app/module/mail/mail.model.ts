@@ -37,7 +37,7 @@ const mailSchema = new Schema<IMail>(
       type: String,
       required: true,
     },
-    phone: {
+    phoneNumber: {
       type: String,
       required: true,
     },

@@ -3,7 +3,7 @@ import { IUserName } from '../../interface/user';
 
 export interface IMail {
   user: Types.ObjectId;
-  phone: string;
+  phoneNumber: string;
   name: IUserName;
   email: string;
   isDeleted: boolean;

@@ -31,4 +31,5 @@ export default {
   success_url: process.env.SUCCESS_URL,
   failed_url: process.env.FAILED_URL,
   cancel_url: process.env.CANCEL_URL,
+  reset_pass_ui_link: process.env.RESET_PASS_UI_LINK,
 };

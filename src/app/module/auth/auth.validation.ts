@@ -24,8 +24,27 @@ const changePasswordValidationSchema = z.object({
   }),
 });
 
+const forgetPasswordValidationSchema = z.object({
+  body: z.object({
+    email: z.string().email('Invalid email address'),
+  }),
+});
+
+const resetPasswordValidationSchema = z.object({
+  body: z.object({
+    id: z.string({ message: 'Id is required' }),
+    newPassword: z
+      .string({
+        message: 'New password is required',
+      })
+      .min(6, 'Password must be at least 6 characters long'),
+  }),
+});
+
 export const authValidations = {
   loginValidationSchema,
   refreshTokenValidationSchema,
   changePasswordValidationSchema,
+  forgetPasswordValidationSchema,
+  resetPasswordValidationSchema,
 };

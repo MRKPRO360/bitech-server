@@ -22,7 +22,7 @@ const createMailValidation = z.object({
     subject: z.string({
       message: 'Subject is required',
     }),
-    phone: z.string({
+    phoneNumber: z.string({
       message: 'Phone is required',
     }),
     description: z

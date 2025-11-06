@@ -9,6 +9,8 @@ import { ILogin } from './auth.interface';
 import { USER_ROLE } from '../user/user.constant';
 import Customer from '../customer/customer.model';
 import Admin from '../admin/admin.model';
+import { sendEmail } from '../../utils/sendEmail';
+import { generateResetPasswordHTML } from '../../config/generateResetPasswordHTML';
 
 const loginUserFromDB = async (payload: ILogin) => {
   // CHECK IF USER EXISTS
@@ -153,8 +155,127 @@ const changePasswordInDB = async (
   return result;
 };
 
+const forgetPassword = async (payload: string) => {
+  // checking if the user is exist
+  const user = await User.findOne({ email: payload });
+
+  if (!user) {
+    throw new AppError(404, 'This user is not found !');
+  }
+  // checking if the user is already deleted
+
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(403, 'This user is deleted !');
+  }
+
+  // checking if the user is blocked
+
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(403, 'This user is blocked ! !');
+  }
+
+  let profileImg = '';
+
+  if (user.role === USER_ROLE.customer) {
+    const customer = await Customer.findOne({ user: user._id });
+
+    profileImg = customer?.profileImg as string;
+  }
+
+  if (user.role === USER_ROLE.admin) {
+    const admin = await Admin.findOne({ user: user._id });
+
+    profileImg = admin?.profileImg as string;
+  }
+
+  const jwtPayload = {
+    email: user.email,
+    role: user.role,
+    id: user._id,
+    profileImg: profileImg,
+  };
+
+  const resetToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    '10m',
+  );
+
+  const resetUILink = `${config.reset_pass_ui_link}?id=${user.id}&token=${resetToken}`;
+
+  await sendEmail(
+    config.sender_email as string,
+    generateResetPasswordHTML(resetUILink, user),
+    user.email,
+    'Forgot Password',
+    'Reset your password within 10mins',
+  );
+
+  return resetUILink;
+};
+
+const resetPassword = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  // checking if the user is exist
+  const user = await User.isUserExistsById(payload.id);
+
+  if (!user) {
+    throw new AppError(404, 'This user is not found !');
+  }
+  // checking if the user is already deleted
+
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(403, 'This user is deleted !');
+  }
+
+  // checking if the user is blocked
+
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(403, 'This user is blocked ! !');
+  }
+
+  // checking if the given token is valid
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+
+  const { id } = decoded;
+
+  if (id !== payload.id) throw new AppError(401, 'You are not authorized!');
+
+  //hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  const result = await User.findByIdAndUpdate(
+    payload.id,
+    {
+      password: newHashedPassword,
+      passwordChangedAt: new Date(),
+    },
+    { new: true },
+  );
+
+  return result;
+};
+
 export const authServices = {
   loginUserFromDB,
   refreshTokenFromDB,
   changePasswordInDB,
+  forgetPassword,
+  resetPassword,
 };
