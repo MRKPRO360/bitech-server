@@ -24,6 +24,8 @@ export interface IEmployee extends Document {
   designation: TDesignation;
   salary?: string;
   skills: string[];
+  exitReason: string;
+  exitDate: Date;
   joiningDate: Date;
   role: TUserRole;
   status: TEmployeeStatus;

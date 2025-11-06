@@ -1,6 +1,7 @@
 import { Document, Model, Types } from 'mongoose';
 import { TMethod } from '../user/user.constant';
 import { IUserAddress, IUserName } from '../../interface/user';
+import { TCustomerStatus } from './customer.constant';
 
 export interface ICustomer extends Document {
   name: IUserName;
@@ -9,7 +10,7 @@ export interface ICustomer extends Document {
   user: Types.ObjectId;
 
   orders?: Types.ObjectId[];
-
+  status: TCustomerStatus;
   profileImg?: string;
   address?: IUserAddress;
   method?: TMethod;

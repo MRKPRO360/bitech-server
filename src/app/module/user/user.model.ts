@@ -32,7 +32,8 @@ const userSchema = new Schema<IUser, UserModel>(
     },
     phoneNumber: {
       type: String,
-      unique: true,
+      required: true,
+      // unique: true,
     },
     password: {
       type: String,
@@ -70,7 +71,7 @@ const userSchema = new Schema<IUser, UserModel>(
 );
 
 userSchema.virtual('fullName').get(function () {
-  return this?.name?.firstName + this?.name?.lastName;
+  return this?.name?.firstName + ' ' + this?.name?.lastName;
 });
 
 userSchema.pre('save', async function (next) {

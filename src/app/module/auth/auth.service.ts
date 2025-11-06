@@ -122,6 +122,9 @@ const changePasswordInDB = async (
   // CHECK IF USER EXISTS
   const user = await User.isUserExistsById(id);
 
+  if (payload.oldPassword === payload.newPassword)
+    throw new AppError(400, 'Password remains the same!');
+
   // CHECK IF PASSWORD IS CORRECT
   const isPasswordCorrect = await User.isPasswordMatched(
     payload.oldPassword,

@@ -8,7 +8,7 @@ const userValidationSchema = z.object({
         message: 'Password must be string!',
       })
       .max(20, { message: 'Password cannot be more than 20 characters!' })
-      .min(5, { message: 'Password must be at least 5 characters long!' }),
+      .min(6, { message: 'Password must be at least 6 characters long!' }),
   }),
 });
 

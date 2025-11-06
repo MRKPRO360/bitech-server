@@ -23,6 +23,10 @@ router
   );
 
 router
+  .route('/change-status')
+  .patch(auth(USER_ROLE.admin), CustomerControllers.changeCustomerStatus);
+
+router
   .route('/:id')
   .get(auth(USER_ROLE.admin), CustomerControllers.getSingleCustomer)
 

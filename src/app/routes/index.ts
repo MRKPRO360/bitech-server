@@ -6,6 +6,9 @@ import ProjectRouter from '../module/project/project.route';
 import PrebuiltProjectRouter from '../module/prebuilt-project/prebuiltProject.route';
 import AuthRouter from '../module/auth/auth.routes';
 import SSLRouter from '../module/sslcommerz/sslcommerz.routes';
+import EmployeeRouter from '../module/employee/employee.routes';
+import AdminRouter from '../module/admin/admin.routes';
+import MailRouter from '../module/mail/mail.routes';
 
 const router = Router();
 const moduleRoutes = [
@@ -16,6 +19,18 @@ const moduleRoutes = [
   {
     path: '/customers',
     route: CustomerRouter,
+  },
+  {
+    path: '/mails',
+    route: MailRouter,
+  },
+  {
+    path: '/admins',
+    route: AdminRouter,
+  },
+  {
+    path: '/employees',
+    route: EmployeeRouter,
   },
   {
     path: '/orders',

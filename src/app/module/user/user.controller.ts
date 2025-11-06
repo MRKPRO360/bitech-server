@@ -49,6 +49,23 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const createEmployee = catchAsync(async (req, res) => {
+  const { password, ...employeeData } = req.body;
+
+  const result = await UserServices.createEmployeeInDB(
+    req.file,
+    password,
+    employeeData,
+  );
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Employee created successfully',
+    data: result,
+  });
+});
+
 const getMe = catchAsync(async (req, res) => {
   console.log('ok');
 
@@ -79,6 +96,7 @@ const changeStatus = catchAsync(async (req, res) => {
 export const UserControllers = {
   createCustomer,
   createAdmin,
+  createEmployee,
   getMe,
   changeStatus,
   socialLogin,

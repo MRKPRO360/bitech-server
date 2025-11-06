@@ -10,6 +10,9 @@ import config from '../../config';
 
 import Admin from '../admin/admin.model';
 import { ICustomer } from '../customer/customer.interface';
+import { IEmployee } from '../employee/employee.interface';
+import Employee from '../employee/employee.model';
+import { IAdmin } from '../admin/admin.interface';
 
 const socialLogin = async (
   payload: Partial<IUser> & { profileImg?: string },
@@ -34,6 +37,7 @@ const socialLogin = async (
       const newUser = await User.create(
         [
           {
+            phoneNumber: 'n/a',
             email,
             name,
             password: randomPassword, // Required field
@@ -117,13 +121,12 @@ const createCustomerInDB = async (
   userData.password = password || randomPass;
   userData.email = payload.email;
   userData.method = payload.method;
-  userData.phoneNumber = payload.phoneNumber || '';
+  userData.phoneNumber = payload.phoneNumber;
   userData.role = USER_ROLE.customer;
   userData.name = payload.name;
 
   const session = await mongoose.startSession();
   session.startTransaction();
-  console.log(userData);
 
   try {
     // CREATING USER
@@ -177,16 +180,67 @@ const createCustomerInDB = async (
   }
 };
 
+const createEmployeeInDB = async (
+  file: any,
+  password: string,
+  payload: IEmployee,
+) => {
+  const userData: Partial<IUser> = {};
+
+  // WE"LL BYPASS THE PASSWORD SINCE AN ADMIN WILL CREATE AN ACCOUNT
+  const randomPass = Math.ceil(Math.random() * 1000000).toString();
+  userData.password = password || randomPass;
+
+  userData.email = payload.email;
+  userData.method = payload.method;
+  userData.phoneNumber = payload.phoneNumber;
+  userData.name = payload.name;
+  userData.role = USER_ROLE.employee;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // CREATING USER
+    const newUser = await User.create([userData], { session });
+
+    if (!newUser.length) {
+      throw new AppError(400, 'Failed to create user!');
+    }
+
+    payload.profileImg = payload.profileImg || file?.path || '';
+    payload.user = newUser[0]._id as Types.ObjectId;
+
+    // CREATING CUSTOMER
+    const newEmployee = await Employee.create([payload], { session });
+
+    if (!newEmployee.length) {
+      throw new AppError(400, 'Failed to create Employee!');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return {
+      newEmployee,
+    };
+  } catch (err: any) {
+    console.log(err);
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error(err);
+  }
+};
+
 const createAdminInDB = async (
   file: any,
   password: string,
-  payload: ICustomer,
+  payload: IAdmin,
 ) => {
   const userData: Partial<IUser> = {};
 
   userData.password = password;
   userData.email = payload.email;
-  userData.method = payload.method;
   userData.phoneNumber = payload.phoneNumber;
   userData.role = USER_ROLE.admin;
   userData.name = payload.name;
@@ -273,4 +327,5 @@ export const UserServices = {
   createAdminInDB,
   getMe,
   changeStatus,
+  createEmployeeInDB,
 };

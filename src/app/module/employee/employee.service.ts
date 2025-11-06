@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
-import Customer from './customer.model';
+import Employee from './employee.model';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
-import { ICustomer } from './employee.interface';
+import { IEmployee } from './employee.interface';
 
 import { USER_ROLE } from '../user/user.constant';
 import createToken from '../auth/auth.utils';
 import config from '../../config';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { customerSearchableFields } from './employee.constant';
+import { employeeSearchableFields } from './employee.constant';
 
-const getAllCustomersFromDB = async (query: Record<string, unknown>) => {
-  const customerQuery = new QueryBuilder(Customer.find().lean() as any, query)
-    .search(customerSearchableFields)
+const getAllEmployeesFromDB = async (query: Record<string, unknown>) => {
+  const EmployeeQuery = new QueryBuilder(Employee.find(), query)
+    .search(employeeSearchableFields)
     .filter()
     .sort()
     .paginate()
     .fields();
-  const meta = await customerQuery.countTotal();
-  const result = await customerQuery.modelQuery;
+  const meta = await EmployeeQuery.countTotal();
+  const result = await EmployeeQuery.modelQuery;
 
   return {
     meta,
@@ -28,26 +28,26 @@ const getAllCustomersFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
-const getSingleCustomerFromDB = async (id: string) => {
-  return await Customer.findById(id);
+const getSingleEmployeeFromDB = async (id: string) => {
+  return await Employee.findById(id);
 };
 
-const deleteCustomerFromDB = async (id: string) => {
+const deleteEmployeeFromDB = async (id: string) => {
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
-    const deletedCustomer = await Customer.findByIdAndUpdate(
+    const deletedEmployee = await Employee.findByIdAndUpdate(
       id,
       { isDeleted: true },
       { new: true, session },
     );
 
-    if (!deletedCustomer) {
-      throw new AppError(400, 'Failed to delete customer!');
+    if (!deletedEmployee) {
+      throw new AppError(400, 'Failed to delete Employee!');
     }
 
-    const userId = deletedCustomer.user;
+    const userId = deletedEmployee.user;
 
     const deletedUser = await User.findByIdAndUpdate(
       userId,
@@ -65,38 +65,38 @@ const deleteCustomerFromDB = async (id: string) => {
     await session.commitTransaction();
     session.endSession();
 
-    return deletedCustomer;
+    return deletedEmployee;
   } catch (err: any) {
     console.log(err);
 
     await session.abortTransaction();
     session.endSession();
-    throw new Error('Failed to delete customer!');
+    throw new Error('Failed to delete Employee!');
   }
 };
 
-const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
+const updateEmployeeInDB = async (payload: Partial<IEmployee>, file?: any) => {
   if (!payload._id) {
-    throw new AppError(404, "Customer id isn't provided");
+    throw new AppError(404, "Employee id isn't provided");
   }
 
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    // Fetch existing user & customer
-    const customer = await Customer.findById(payload._id).session(session);
+    // Fetch existing user & Employee
+    const employee = await Employee.findById(payload._id).session(session);
 
     const user = await User.findOne({
-      email: customer?.email,
-      role: USER_ROLE.customer,
+      email: employee?.email,
+      role: USER_ROLE.employee,
     }).session(session);
 
-    if (!user || !customer) {
-      throw new AppError(404, 'User or Customer not found');
+    if (!user || !employee) {
+      throw new AppError(404, 'User or Employee not found');
     }
 
-    // If a new image is uploaded, update profileImg for both User and Customer
+    // If a new image is uploaded, update profileImg for both User and Employee
     if (file?.path) {
       payload.profileImg = file.path || payload.profileImg;
     }
@@ -109,10 +109,10 @@ const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
       new: true,
     });
 
-    // Update Customer
+    // Update Employee
 
-    const updatedCustomer = await Customer.findByIdAndUpdate(
-      customer._id,
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      employee._id,
       data,
       {
         session,
@@ -123,12 +123,12 @@ const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
     await session.commitTransaction();
     await session.endSession();
 
-    if (!updatedCustomer) throw new AppError(400, 'Customer update failed!');
+    if (!updatedEmployee) throw new AppError(400, 'Employee update failed!');
     const jwtPayload = {
-      email: updatedCustomer.email,
-      role: USER_ROLE.customer,
+      email: updatedEmployee.email,
+      role: USER_ROLE.employee,
       id: user._id,
-      profileImg: updatedCustomer.profileImg,
+      profileImg: updatedEmployee.profileImg,
     };
 
     const accessToken = createToken(
@@ -155,9 +155,27 @@ const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
   }
 };
 
-export const CustomerServices = {
-  getAllCustomersFromDB,
-  getSingleCustomerFromDB,
-  updateCustomerInDB,
-  deleteCustomerFromDB,
+const changeEmployeeStatusInDB = async (payload: Partial<IEmployee>) => {
+  const employee = await Employee.findById(payload._id);
+
+  const user = await User.findOne({
+    email: employee?.email,
+    role: USER_ROLE.employee,
+  });
+
+  if (!user || !employee) {
+    throw new AppError(404, 'User or Employee not found');
+  }
+
+  return await Employee.findByIdAndUpdate(employee._id, payload, {
+    new: true,
+  });
+};
+
+export const EmployeeServices = {
+  getAllEmployeesFromDB,
+  getSingleEmployeeFromDB,
+  changeEmployeeStatusInDB,
+  updateEmployeeInDB,
+  deleteEmployeeFromDB,
 };

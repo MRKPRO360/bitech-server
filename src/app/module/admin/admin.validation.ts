@@ -36,6 +36,21 @@ export const createAdminValidationSchema = z.object({
   }),
 });
 
+export const updateAdminValidationSchema = z.object({
+  body: z.object({
+    name: createAdminNameSchema.optional(),
+    address: createAdminAddressSchema.optional(),
+    email: z.string().email('Invalid email address').optional(),
+    phoneNumber: z
+      .string()
+      .trim()
+      .min(10, 'Phone number must be at least 10 digits')
+      .optional(),
+    profileImg: z.string().url('Invalid URL').optional(),
+  }),
+});
+
 export const AdminValidationSchema = {
   createAdminValidationSchema,
+  updateAdminValidationSchema,
 };

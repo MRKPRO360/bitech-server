@@ -10,6 +10,7 @@ export const METHOD = {
   credentials: 'credentials',
   github: 'github',
   google: 'google',
+  facebook: 'facebook',
 } as const;
 
 export const UserStatus = ['in-progress', 'blocked'];

@@ -7,3 +7,6 @@ export const customerSearchableFields = [
   'address.country',
   'address.zipCode',
 ];
+export const CustomerStatus = ['in-progress', 'blocked'] as const;
+
+export type TCustomerStatus = (typeof CustomerStatus)[number];

@@ -11,6 +11,7 @@ import { USER_ROLE } from './user.constant';
 import { UserValidation } from './user.validation';
 import validateRequest from '../../middleware/validateRequest';
 import auth from '../../middleware/auth';
+import { EmployeeValidationsSchema } from '../employee/employee.validation';
 
 const router = express.Router();
 
@@ -34,6 +35,16 @@ router.route('/create-admin').post(
   },
   validateRequest(AdminValidationSchema.createAdminValidationSchema),
   UserControllers.createAdmin,
+);
+
+router.route('/create-employee').post(
+  multerUpload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validateRequest(EmployeeValidationsSchema.createEmployeeValidatonSchema),
+  UserControllers.createEmployee,
 );
 
 router.post(

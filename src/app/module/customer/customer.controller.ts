@@ -4,7 +4,6 @@ import { CustomerServices } from './customer.service';
 
 const getAllCustomers = catchAsync(async (req, res) => {
   const customers = await CustomerServices.getAllCustomersFromDB(req?.query);
-  console.log(customers);
 
   sendResponse(res, {
     statusCode: 200,
@@ -49,9 +48,21 @@ const deleteCustomer = catchAsync(async (req, res) => {
   });
 });
 
+const changeCustomerStatus = catchAsync(async (req, res) => {
+  const customer = await CustomerServices.changeCustomerStatusInDB(req.body);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Customer status updated successfully',
+    data: customer,
+  });
+});
+
 export const CustomerControllers = {
   getAllCustomers,
   getSingleCustomer,
   updateCustomer,
   deleteCustomer,
+  changeCustomerStatus,
 };

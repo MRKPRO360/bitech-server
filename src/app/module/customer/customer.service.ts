@@ -13,7 +13,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { customerSearchableFields } from './customer.constant';
 
 const getAllCustomersFromDB = async (query: Record<string, unknown>) => {
-  const customerQuery = new QueryBuilder(Customer.find().lean() as any, query)
+  const customerQuery = new QueryBuilder(Customer.find(), query)
     .search(customerSearchableFields)
     .filter()
     .sort()
@@ -155,9 +155,27 @@ const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
   }
 };
 
+const changeCustomerStatusInDB = async (payload: Partial<ICustomer>) => {
+  const customer = await Customer.findById(payload._id);
+
+  const user = await User.findOne({
+    email: customer?.email,
+    role: USER_ROLE.customer,
+  });
+
+  if (!user || !customer) {
+    throw new AppError(404, 'User or customer not found');
+  }
+
+  return await Customer.findByIdAndUpdate(customer._id, payload, {
+    new: true,
+  });
+};
+
 export const CustomerServices = {
   getAllCustomersFromDB,
   getSingleCustomerFromDB,
   updateCustomerInDB,
+  changeCustomerStatusInDB,
   deleteCustomerFromDB,
 };

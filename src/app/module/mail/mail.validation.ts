@@ -1,4 +1,15 @@
 import { z } from 'zod';
+const customerNameValidationSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(1)
+    .max(20)
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'First Name must start with a capital letter',
+    }),
+  lastName: z.string().trim().optional(),
+});
 
 const createMailValidation = z.object({
   body: z.object({
@@ -7,16 +18,18 @@ const createMailValidation = z.object({
         message: 'Email is required',
       })
       .email('Invalid email address'),
-    name: z
+    name: customerNameValidationSchema,
+    subject: z.string({
+      message: 'Subject is required',
+    }),
+    phone: z.string({
+      message: 'Phone is required',
+    }),
+    description: z
       .string({
-        message: 'Name is required',
+        message: 'Description is required',
       })
-      .min(1, 'Name is required'),
-    message: z
-      .string({
-        message: 'Message is required',
-      })
-      .min(1, 'Message is required'),
+      .min(1, 'Description is required'),
   }),
 });
 

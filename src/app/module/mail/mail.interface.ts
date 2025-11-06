@@ -1,5 +1,12 @@
+import { Types } from 'mongoose';
+import { IUserName } from '../../interface/user';
+
 export interface IMail {
-  name: string;
+  user: Types.ObjectId;
+  phone: string;
+  name: IUserName;
   email: string;
-  message: string;
+  isDeleted: boolean;
+  description: string;
+  subject: string;
 }

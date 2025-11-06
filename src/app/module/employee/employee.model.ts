@@ -31,7 +31,7 @@ const employeeAddressSchema = new Schema<IUserAddress>(
   {
     city: { type: String },
     zipCode: { type: String },
-    country: { type: String },
+    country: { type: String, default: 'Bangladesh' },
   },
   { _id: false },
 );
@@ -43,7 +43,7 @@ const EmployeeSchema = new Schema<IEmployee, EmployeeModel>(
       required: true,
     },
     email: { type: String, required: true, unique: true },
-    phoneNumber: { type: String, required: true, unique: true },
+    phoneNumber: { type: String, required: true },
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
@@ -57,6 +57,7 @@ const EmployeeSchema = new Schema<IEmployee, EmployeeModel>(
         values: GENDER,
         message: '{VALUE} is not supported',
       },
+      default: GENDER[2],
     },
     role: {
       type: String,
@@ -97,20 +98,33 @@ const EmployeeSchema = new Schema<IEmployee, EmployeeModel>(
       type: Date,
     },
 
+    exitReason: {
+      type: String,
+    },
+    exitDate: {
+      type: Date,
+    },
+
     address: {
       type: employeeAddressSchema,
     },
     profileImg: String,
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
     virtuals: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
 
 //virtual
 EmployeeSchema.virtual('fullName').get(function () {
-  return this?.name?.firstName + this?.name?.lastName;
+  return this?.name?.firstName + ' ' + this?.name?.lastName;
 });
 
 // Query Middleware

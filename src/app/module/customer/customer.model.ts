@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { IUserAddress, IUserName } from '../../interface/user';
 import { CustomerModel, ICustomer } from './customer.interface';
+import { CustomerStatus } from './customer.constant';
 
 const customerNameSchema = new Schema<IUserName>(
   {
@@ -35,6 +36,13 @@ const CustomerSchema = new Schema<ICustomer, CustomerModel>(
       type: customerNameSchema,
       required: true,
     },
+    status: {
+      type: String,
+      enum: {
+        values: CustomerStatus,
+      },
+      default: CustomerStatus[0],
+    },
     email: { type: String, required: true, unique: true },
     phoneNumber: { type: String },
     user: {
@@ -53,12 +61,14 @@ const CustomerSchema = new Schema<ICustomer, CustomerModel>(
   {
     timestamps: true,
     virtuals: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
 
 //virtual
 CustomerSchema.virtual('fullName').get(function () {
-  return this?.name?.firstName + this?.name?.lastName;
+  return this?.name?.firstName + ' ' + this?.name?.lastName;
 });
 
 // Query Middleware

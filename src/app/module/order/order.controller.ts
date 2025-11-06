@@ -41,6 +41,28 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllProjectOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getAllProjectOrdersFromDB(req.query);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Orders retrived succesfully',
+    data: result,
+  });
+});
+
+const getAllServiceOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getAllServiceOrdersFromDB(req.query);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Orders retrived succesfully',
+    data: result,
+  });
+});
+
 const getOrderDetails = catchAsync(async (req: Request, res: Response) => {
   const result = await OrderService.getOrderDetailsFromDB(req.params.orderId);
 
@@ -62,6 +84,34 @@ const getMyOrders = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Order retrive succesfully',
+    data: result,
+  });
+});
+
+const getMyProjectOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getMyProjectOrdersFromDB(
+    req.query,
+    req.user as JwtPayload,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Project order retrieved succesfully',
+    data: result,
+  });
+});
+
+const getMyServiceOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getMyServiceOrdersFromDB(
+    req.query,
+    req.user as JwtPayload,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Service order retrieved succesfully',
     data: result,
   });
 });
@@ -107,5 +157,9 @@ export const OrderController = {
   getAllOrders,
   getOrderDetails,
   getMyOrders,
+  getMyProjectOrders,
+  getMyServiceOrders,
+  getAllServiceOrders,
+  getAllProjectOrders,
   updateOrderStatusByAdmin,
 };

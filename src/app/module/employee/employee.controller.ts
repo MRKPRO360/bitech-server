@@ -1,57 +1,70 @@
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-import { CustomerServices } from './customer.service';
+import { EmployeeServices } from './employee.service';
 
-const getAllCustomers = catchAsync(async (req, res) => {
-  const customers = await CustomerServices.getAllCustomersFromDB(req?.query);
-  console.log(customers);
+const getAllEmployees = catchAsync(async (req, res) => {
+  const employees = await EmployeeServices.getAllEmployeesFromDB(req?.query);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Customers retrieved successfully',
-    data: customers,
+    message: 'Employees retrieved successfully',
+    data: employees,
   });
 });
 
-const getSingleCustomer = catchAsync(async (req, res) => {
+const getSingleEmployee = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const customers = await CustomerServices.getSingleCustomerFromDB(id);
+  const employee = await EmployeeServices.getSingleEmployeeFromDB(id);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Customers retrieved successfully',
-    data: customers,
+    message: 'Employee retrieved successfully',
+    data: employee,
   });
 });
 
-const updateCustomer = catchAsync(async (req, res) => {
-  const result = await CustomerServices.updateCustomerInDB(req.body, req.file);
+const updateEmployee = catchAsync(async (req, res) => {
+  const result = await EmployeeServices.updateEmployeeInDB(req.body, req.file);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Customer updated successfully!',
+    message: 'Employee updated successfully!',
     data: result,
   });
 });
 
-const deleteCustomer = catchAsync(async (req, res) => {
+const deleteEmployee = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const customer = await CustomerServices.deleteCustomerFromDB(id);
+  const Employee = await EmployeeServices.deleteEmployeeFromDB(id);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Customer deleted successfully',
-    data: customer,
+    message: 'Employee deleted successfully',
+    data: Employee,
   });
 });
 
-export const CustomerControllers = {
-  getAllCustomers,
-  getSingleCustomer,
-  updateCustomer,
-  deleteCustomer,
+const changeEmployeeStatus = catchAsync(async (req, res) => {
+  console.log(req.body);
+
+  const employee = await EmployeeServices.changeEmployeeStatusInDB(req.body);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Employee status updated successfully',
+    data: employee,
+  });
+});
+
+export const EmployeeControllers = {
+  getAllEmployees,
+  getSingleEmployee,
+  updateEmployee,
+  deleteEmployee,
+  changeEmployeeStatus,
 };

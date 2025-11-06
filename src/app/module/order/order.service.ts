@@ -30,7 +30,6 @@ const createOrder = async (
     // if (orderData.services) {
     // const servicePrice =
     // }
-    console.log(orderData.projects);
 
     // return;
     // ADDING ALL PROJECTS PRICE
@@ -61,7 +60,10 @@ const createOrder = async (
 
     // Create the order
     const order = new Order({
-      ...orderData,
+      projects: orderData.projects?.map((p) => ({ project: p._id })) || [],
+      services: orderData.services?.map((s) => ({ service: s._id })) || [],
+      paymentMethod: orderData.paymentMethod,
+      amount: totalAmount,
       user: authUser.id,
     });
 
@@ -129,6 +131,61 @@ const createPaymentIntent = async (price: string) => {
   return paymentIntent.client_secret;
 };
 
+const getAllProjectOrdersFromDB = async (query: Record<string, unknown>) => {
+  const orderQuery = new QueryBuilder(
+    Order
+      .find
+      //   {
+      //   'projects.0': { $exists: true }, // Only orders with projects
+      // }
+      ()
+      .populate('user')
+      .populate({
+        path: 'projects',
+        populate: {
+          path: 'project',
+          model: 'PrebuiltProject',
+        },
+      }),
+    query,
+  )
+    .search(['user.name', 'user.email', 'projects.project.title'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery.lean();
+
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
+const getAllServiceOrdersFromDB = async (query: Record<string, unknown>) => {
+  const orderQuery = new QueryBuilder(
+    Order.find().populate('user services.service'),
+    query,
+  )
+    .search(['user.name', 'user.email', 'services.service.slug'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery.lean();
+
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
   const orderQuery = new QueryBuilder(
     Order.find().populate('user services.service projects.project'),
@@ -161,14 +218,87 @@ const getOrderDetailsFromDB = async (orderId: string) => {
   return order;
 };
 
+const getMyServiceOrdersFromDB = async (
+  query: Record<string, unknown>,
+  authUser: JwtPayload,
+) => {
+  const orderQuery = new QueryBuilder(
+    Order.find({
+      user: authUser.id,
+      'services.0': { $exists: true }, // Only orders with services
+    })
+      .populate('user')
+      .populate({
+        path: 'services.service',
+        model: 'Service',
+      }),
+    query,
+  )
+    .search(['user.name', 'user.email', 'services.service.name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery;
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
+// Get orders with projects
+const getMyProjectOrdersFromDB = async (
+  query: Record<string, unknown>,
+  authUser: JwtPayload,
+) => {
+  const orderQuery = new QueryBuilder(
+    Order.find({
+      user: authUser.id,
+      'projects.0': { $exists: true }, // Only orders with projects
+    })
+      .populate('user')
+      .populate({
+        path: 'projects',
+        populate: {
+          path: 'project',
+          model: 'PrebuiltProject',
+        },
+      }),
+    query,
+  )
+    .search(['user.name', 'user.email', 'projects.project.title'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery.lean();
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 const getMyOrdersFromDB = async (
   query: Record<string, unknown>,
   authUser: JwtPayload,
 ) => {
   const orderQuery = new QueryBuilder(
-    Order.find({ user: authUser.id }).populate(
-      'user services.service projects.project',
-    ),
+    Order.find({ user: authUser.id })
+      .populate('user')
+      .populate({
+        path: 'projects.project',
+        model: 'PrebuiltProject',
+      })
+      .populate({
+        path: 'services.service',
+        model: 'Service',
+      }),
     query,
   )
     .search([
@@ -219,6 +349,10 @@ export const OrderService = {
   createPaymentIntent,
   getOrderDetailsFromDB,
   getAllOrdersFromDB,
+  getMyProjectOrdersFromDB,
+  getMyServiceOrdersFromDB,
+  getAllProjectOrdersFromDB,
+  getAllServiceOrdersFromDB,
   updateOrderStatusByAdminFromDB,
   getMyOrdersFromDB,
 };

@@ -4,6 +4,7 @@ import { IPrebuiltProject } from '../prebuilt-project/prebuiltProject.interface'
 export type IStatus = 'Pending' | 'Completed' | 'Cancelled';
 
 export interface IOrderService {
+  _id: Types.ObjectId;
   service: Types.ObjectId;
 }
 

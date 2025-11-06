@@ -20,6 +20,8 @@ export default {
   stripe_sk_test: process.env.STRIPE_SK_TEST,
   sender_email: process.env.SENDER_EMAIL,
   sender_app_password: process.env.SENDER_APP_PASSWORD,
+  sender_phone: process.env.SENDER_PHONE,
+  sender_name: process.env.SENDER_NAME,
   store_id: process.env.STORE_ID,
   store_password: process.env.STORE_PASSWORD,
   is_live: process.env.IS_LIVE === 'true' ? true : false,

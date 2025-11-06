@@ -44,7 +44,7 @@ const orderSchema = new Schema<IOrder>(
     },
     orderStatus: {
       type: String,
-      enum: ['Pending', 'Completed', 'Canecelled'],
+      enum: ['Pending', 'Completed', 'Cancelled'],
       default: 'Pending',
     },
   },
